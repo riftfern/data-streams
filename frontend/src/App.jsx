@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Header } from './components/Header';
 import { StatsBar } from './components/StatsBar';
+import { TierToggle } from './components/TierToggle';
 import { Liquidations } from './components/Liquidations';
 import { BigLiquidations } from './components/BigLiquidations';
 import { Trades } from './components/Trades';
@@ -16,6 +17,7 @@ const TABS = [
 
 function App() {
     const [activeTab, setActiveTab] = useState('liquidations');
+    const [tier, setTier] = useState(0); // 0 = all, 25, 50, 100
 
     const ActiveComponent = TABS.find(t => t.id === activeTab)?.Component || Liquidations;
 
@@ -36,9 +38,11 @@ function App() {
                     ))}
                 </div>
 
-                <StatsBar />
+                <StatsBar tier={tier} />
 
-                <ActiveComponent />
+                <TierToggle tier={tier} setTier={setTier} />
+
+                <ActiveComponent tier={tier} />
 
                 <div className="footer">
                     [ QUANT TERMINAL v1.0 ] - DATA STREAMS MONITOR - SYSTEM OPERATIONAL

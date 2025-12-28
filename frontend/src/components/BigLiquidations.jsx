@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useBigLiquidations } from '../hooks/useData';
 import { DataTable, Legend } from './DataTable';
 import { formatTime, formatNumber, formatUSD, getSideClass } from '../utils/formatters';
@@ -17,8 +18,16 @@ const legendItems = [
     { color: 'sell', label: 'SELL (Short Liquidated)' }
 ];
 
-export function BigLiquidations() {
+export function BigLiquidations({ tier }) {
     const { data, loading } = useBigLiquidations();
+
+    const filteredData = useMemo(() => {
+        if (tier === 0) return data;
+        return data.filter(row => {
+            const rowTier = parseInt(row[12]) || 0;
+            return rowTier > 0 && rowTier <= tier;
+        });
+    }, [data, tier]);
 
     const renderRow = (row, index) => {
         const symbol = row[0];
@@ -28,11 +37,15 @@ export function BigLiquidations() {
         const status = row[7];
         const time = row[10];
         const usdSize = row[11] || (parseFloat(avgPrice) * parseFloat(qty));
+        const rowTier = parseInt(row[12]) || 0;
 
         return (
             <tr key={index}>
                 <td>{formatTime(time)}</td>
-                <td className="symbol">{symbol || '--'}</td>
+                <td className="symbol">
+                    {symbol || '--'}
+                    {rowTier > 0 && <span className={`tier-badge tier-${rowTier}`}>{rowTier}</span>}
+                </td>
                 <td className={getSideClass(side)}>{side || '--'}</td>
                 <td>{formatNumber(avgPrice, 6)}</td>
                 <td>{formatNumber(qty, 2)}</td>
@@ -49,7 +62,7 @@ export function BigLiquidations() {
             </div>
             <Legend items={legendItems} />
             <DataTable
-                data={data}
+                data={filteredData}
                 columns={columns}
                 loading={loading}
                 emptyMessage="NO WHALE LIQUIDATIONS RECORDED"

@@ -17,7 +17,7 @@ const legendItems = [
     { color: 'sell', label: 'SELLER (Taker Sell)' }
 ];
 
-export function Trades() {
+export function Trades({ tier }) {
     const { data, loading } = useTrades();
     const [symbolFilter, setSymbolFilter] = useState('');
     const [sideFilter, setSideFilter] = useState('');
@@ -26,6 +26,14 @@ export function Trades() {
 
     const filteredData = useMemo(() => {
         let result = [...data];
+
+        // Apply tier filter (column 8 has tier value in new format)
+        if (tier > 0) {
+            result = result.filter(row => {
+                const rowTier = parseInt(row[8]) || 0;
+                return rowTier > 0 && rowTier <= tier;
+            });
+        }
 
         // Apply filters
         if (symbolFilter) {
@@ -45,8 +53,8 @@ export function Trades() {
         result.sort((a, b) => {
             let valA, valB;
             if (sortBy === 'usd') {
-                valA = parseFloat(a[3]) * parseFloat(a[4]) || 0;
-                valB = parseFloat(b[3]) * parseFloat(b[4]) || 0;
+                valA = parseFloat(a[7]) || (parseFloat(a[3]) * parseFloat(a[4])) || 0;
+                valB = parseFloat(b[7]) || (parseFloat(b[3]) * parseFloat(b[4])) || 0;
             } else {
                 valA = parseInt(a[0]) || 0;
                 valB = parseInt(b[0]) || 0;
@@ -55,7 +63,7 @@ export function Trades() {
         });
 
         return result;
-    }, [data, symbolFilter, sideFilter, sortBy, sortOrder]);
+    }, [data, tier, symbolFilter, sideFilter, sortBy, sortOrder]);
 
     const handleSort = (field) => {
         if (sortBy === field) {
@@ -72,13 +80,18 @@ export function Trades() {
         const price = row[3];
         const quantity = row[4];
         const isBuyerMaker = row[6];
-        const usdValue = parseFloat(price) * parseFloat(quantity);
+        // Use pre-calculated USD size if available (column 7), else calculate
+        const usdValue = parseFloat(row[7]) || (parseFloat(price) * parseFloat(quantity));
         const side = (isBuyerMaker === 'True' || isBuyerMaker === 'true') ? 'SELLER' : 'BUYER';
+        const rowTier = parseInt(row[8]) || 0;
 
         return (
             <tr key={index}>
                 <td>{formatTime(eventTime)}</td>
-                <td className="symbol">{(symbol || '--').trim()}</td>
+                <td className="symbol">
+                    {(symbol || '--').trim().replace('USDT', '')}
+                    {rowTier > 0 && <span className={`tier-badge tier-${rowTier}`}>{rowTier}</span>}
+                </td>
                 <td>{formatNumber(price, 4)}</td>
                 <td>{formatNumber(quantity, 4)}</td>
                 <td className={getSizeClass(usdValue)}>{formatUSD(usdValue)}</td>

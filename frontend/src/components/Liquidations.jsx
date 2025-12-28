@@ -18,7 +18,7 @@ const legendItems = [
     { color: 'sell', label: 'SELL (Short Liquidated)' }
 ];
 
-export function Liquidations() {
+export function Liquidations({ tier }) {
     const { data, loading } = useLiquidations();
     const [symbolFilter, setSymbolFilter] = useState('');
     const [sideFilter, setSideFilter] = useState('');
@@ -28,6 +28,14 @@ export function Liquidations() {
 
     const filteredData = useMemo(() => {
         let result = [...data];
+
+        // Apply tier filter (column 12 has tier value)
+        if (tier > 0) {
+            result = result.filter(row => {
+                const rowTier = parseInt(row[12]) || 0;
+                return rowTier > 0 && rowTier <= tier;
+            });
+        }
 
         // Apply filters
         if (symbolFilter) {
@@ -59,7 +67,7 @@ export function Liquidations() {
         });
 
         return result;
-    }, [data, symbolFilter, sideFilter, minFilter, sortBy, sortOrder]);
+    }, [data, tier, symbolFilter, sideFilter, minFilter, sortBy, sortOrder]);
 
     const handleSort = (field) => {
         if (sortBy === field) {
@@ -78,11 +86,15 @@ export function Liquidations() {
         const status = row[7];
         const time = row[10];
         const usdSize = row[11] || (parseFloat(avgPrice) * parseFloat(qty));
+        const rowTier = parseInt(row[12]) || 0;
 
         return (
             <tr key={index}>
                 <td>{formatTime(time)}</td>
-                <td className="symbol">{symbol || '--'}</td>
+                <td className="symbol">
+                    {symbol || '--'}
+                    {rowTier > 0 && <span className={`tier-badge tier-${rowTier}`}>{rowTier}</span>}
+                </td>
                 <td className={getSideClass(side)}>{side || '--'}</td>
                 <td>{formatNumber(avgPrice, 6)}</td>
                 <td>{formatNumber(qty, 2)}</td>
