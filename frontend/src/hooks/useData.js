@@ -15,13 +15,14 @@ export function useLiquidations() {
 
     const fetchData = useCallback(async () => {
         try {
-            const response = await fetch('/binance.csv');
+            const response = await fetch('/data/binance.csv');
             if (response.ok) {
                 const csv = await response.text();
                 const parsed = parseCSV(csv);
-                // Sort by time descending (column 10)
-                parsed.sort((a, b) => parseInt(b[10]) - parseInt(a[10]));
-                setData(parsed);
+                // Skip header and sort by time descending (column 10)
+                const dataWithoutHeader = parsed.slice(1);
+                dataWithoutHeader.sort((a, b) => parseInt(b[10]) - parseInt(a[10]));
+                setData(dataWithoutHeader);
             }
         } catch (e) {
             setError(e.message);
@@ -47,13 +48,14 @@ export function useBigLiquidations() {
 
     const fetchData = useCallback(async () => {
         try {
-            const response = await fetch('/binance_big_liqs.csv');
+            const response = await fetch('/data/binance_big_liqs.csv');
             if (response.ok) {
                 const csv = await response.text();
                 const parsed = parseCSV(csv);
-                // Sort by time descending (column 10)
-                parsed.sort((a, b) => parseInt(b[10]) - parseInt(a[10]));
-                setData(parsed);
+                // Skip header and sort by time descending (column 10)
+                const dataWithoutHeader = parsed.slice(1);
+                dataWithoutHeader.sort((a, b) => parseInt(b[10]) - parseInt(a[10]));
+                setData(dataWithoutHeader);
             }
         } catch (e) {
             setError(e.message);
@@ -78,13 +80,14 @@ export function useTrades() {
 
     const fetchData = useCallback(async () => {
         try {
-            const response = await fetch('/binance_trades.csv');
+            const response = await fetch('/data/binance_trades.csv');
             if (response.ok) {
                 const csv = await response.text();
                 const parsed = parseCSV(csv);
-                // Sort by time descending (column 0)
-                parsed.sort((a, b) => parseInt(b[0]) - parseInt(a[0]));
-                setData(parsed);
+                // Skip header and sort by time descending (column 0)
+                const dataWithoutHeader = parsed.slice(1);
+                dataWithoutHeader.sort((a, b) => parseInt(b[0]) - parseInt(a[0]));
+                setData(dataWithoutHeader);
             }
         } catch (e) {
             setError(e.message);

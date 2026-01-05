@@ -1,2 +1,26 @@
+# Python
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+venv/
+.env
+
+# Data
 *.csv
+*.log
+
+# Node.js
+node_modules/
+dist/
+dist-ssr
+*.local
+.eslintcache
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+.claude/

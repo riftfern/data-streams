@@ -8,7 +8,9 @@ from termcolor import cprint
 from symbols import get_tier
 
 websocket_url = 'wss://fstream.binance.com/ws/!forceOrder@arr'
-filename = 'binance_big_liqs.csv'
+# Get path to data directory relative to this script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+filename = os.path.join(script_dir, '..', 'frontend', 'public', 'data', 'binance_big_liqs.csv')
 
 if not os.path.isfile(filename):
     with open(filename, 'w') as f:

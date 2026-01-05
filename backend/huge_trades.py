@@ -9,7 +9,29 @@ from termcolor import cprint
 #list of symbols you want to track
 symbols = ['btcusdt', 'ethusdt', 'solusdt', 'bnbusdt', 'dogeusdt']
 websocket_url_base = 'wss://fstream.binance.com/ws/'
-trades_filename = 'binance_trades.csv'
+# Get path to data directory relative to this script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+trades_filename = os.path.join(script_dir, '..', 'frontend', 'public', 'data', 'binance_trades.csv')
+
+async def binance_trades(uri, trades_filename):
+    # Ensure data directory exists
+    os.makedirs(os.path.dirname(trades_filename), exist_ok=True)
+    
+    async with connect(uri) as websocket:
+        while True:
+            try:
+                msg = await websocket.recv()
+                data = json.loads(msg)
+                
+                symbol = data['s']
+                price = float(data['p'])
+                quantity = float(data['q'])
+                usd_value = price * quantity
+                
+                # Check for huge trades
+                if usd_value > 500000:
+                    filename = os.path.join(script_dir, '..', 'frontend', 'public', 'data', 'binance_trades_big.csv')
+                    with open(filename, 'a') as f:
 
 #check if the csv file exists
 if not os.path.isfile(trades_filename):

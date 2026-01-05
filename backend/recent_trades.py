@@ -10,7 +10,13 @@ from symbols import TOP_100_LOWER, get_tier
 # Track all top 100 symbols
 symbols = TOP_100_LOWER
 websocket_url_base = 'wss://fstream.binance.com/ws/'
-trades_filename = 'binance_trades.csv'
+
+# Get path to data directory relative to this script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+trades_filename = os.path.join(script_dir, '..', 'frontend', 'public', 'data', 'binance_trades.csv')
+
+# Ensure data directory exists
+os.makedirs(os.path.dirname(trades_filename), exist_ok=True)
 
 # Check if the csv file exists
 if not os.path.isfile(trades_filename):
@@ -66,7 +72,7 @@ async def binance_trade_stream(uri, symbol, filename):
                 await asyncio.sleep(5)
 
 async def main():
-    filename = 'binance_trades.csv'
+    filename = trades_filename
 
     # Create a task for each symbol trade binance_trade_stream
     tasks = []

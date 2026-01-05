@@ -1,42 +1,30 @@
 # Binance Data Streams
 
-Real-time tracking of Binance Futures liquidations and large trades with a live dashboard.
+Real-time tracking of Binance Futures liquidations and large trades with a live React dashboard.
 
 ## Features
 
-- **Liquidation tracker** — Monitors forced liquidations across all USDT perpetual pairs
-- **Whale trade detection** — Flags trades above configurable thresholds
-- **Funding rate monitor** — Tracks funding rates for sentiment analysis
-- **Live dashboard** — Frontend visualization of real-time market data
-
-## Tech Stack
-
-**Backend:** Python, Binance WebSocket API  
-**Frontend:** HTML, CSS, JavaScript
+- **Liquidation tracker** — Monitors forced liquidations across all USDT perpetual pairs.
+- **Whale trade detection** — Flags trades above configurable thresholds.
+- **Funding rate monitor** — Tracks funding rates for sentiment analysis.
+- **React Dashboard** — Professional terminal-style visualization of real-time market data.
 
 ## Project Structure
 
 ```
 data-streams/
-├── frontend/           # Live dashboard
-├── liq.py              # Liquidation stream listener
-├── big_liqs.py         # Large liquidation filter
-├── huge_trades.py      # Whale trade detector
-├── funding.py          # Funding rate tracker
-├── recent_trades.py    # Trade stream processor
-├── symbols.py          # Symbol utilities
-└── index.html          # Dashboard entry point
+├── backend/            # Python market data collectors
+├── frontend/           # React dashboard (Vite)
+│   └── public/data/    # Live CSV data storage
+└── README.md
 ```
 
 ## Quick Start
 
+### 1. Setup Backend
 ```bash
-# Clone the repo
-git clone https://github.com/riftfern/data-streams.git
-cd data-streams
-
-# Install dependencies
-pip install websocket-client pandas
+cd backend
+pip install -r requirements.txt
 
 # Run liquidation tracker
 python liq.py
@@ -45,9 +33,17 @@ python liq.py
 python huge_trades.py
 ```
 
+### 2. Setup Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
+The dashboard will be available at `http://localhost:5173`.
+
 ## Configuration
 
-Adjust thresholds in the Python scripts:
+Adjust thresholds in the Python scripts within the `backend/` directory:
 
 ```python
 # big_liqs.py
@@ -57,18 +53,17 @@ MIN_LIQUIDATION_USD = 100000  # Only log liquidations > $100k
 MIN_TRADE_USD = 500000        # Only log trades > $500k
 ```
 
-## Sample Output
+## Sample Output (Terminal)
 
 ```
 [LIQUIDATION] BTCUSDT | LONG | $847,234 @ 67,421.50
 [WHALE TRADE] ETHUSDT | BUY  | $1,203,847 @ 3,842.20
 ```
 
-## Use Cases
+## Tech Stack
 
-- Spot large liquidation cascades before price moves
-- Track whale activity for momentum signals
-- Monitor funding rates for crowded trade detection
+- **Backend:** Python, Binance WebSocket API
+- **Frontend:** React, Vite, CSS (Terminal Aesthetic)
 
 ## Author
 
